@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="ZetaGo-Aurum | Rayhan Dzaky | KYOKO">
+    <meta name="description" content="Toko Rizky.ID — Pusat Penjualan Buku Digital Terlaris. Belajar Crypto, Saham, Forex dari Nol.">
+    <title>Toko Rizky.ID — Buku Digital Premium</title>
+
+    <!-- ============================================================
+         CDN DEPENDENCIES
+         Jangan hapus bagian ini, ini adalah library yang dibutuhkan.
+    ============================================================ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'] },
+                colors: {
+                    dark: { 900: '#0b1120', 800: '#0f172a', 700: '#1e293b', 600: '#334155' },
+                    accent: { cyan: '#06b6d4', purple: '#8b5cf6', pink: '#ec4899' },
+                    glass: { light: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.1)' }
+                }
+            }
+        }
+    }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: #0b1120; color: #e2e8f0; overflow-x: hidden; }
+        .font-heading { font-family: 'Outfit', sans-serif; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+        .glass-strong { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); }
+        .gradient-text { background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .gradient-border { border-image: linear-gradient(135deg, #06b6d4, #8b5cf6) 1; }
+        .btn-gradient { background: linear-gradient(135deg, #06b6d4, #8b5cf6); transition: all 0.3s ease; }
+        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(6,182,212,0.3); }
+        .btn-google { background: white; color: #333; transition: all 0.3s ease; }
+        .btn-google:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,255,255,0.15); }
+        .card-hover { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.3); }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; pointer-events: none; }
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-20px); } }
+        @keyframes pulse-glow { 0%,100% { opacity:0.4; } 50% { opacity:0.7; } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+        .watermark-badge { position:fixed; bottom:16px; right:16px; z-index:9999; font-size:11px; padding:6px 14px; border-radius:20px; }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#0b1120; } ::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+        .toast { position:fixed; top:24px; right:24px; z-index:10000; padding:16px 24px; border-radius:12px; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- ============================================================
+         FIREBASE INITIALIZATION
+         Ini adalah konfigurasi Firebase. Jangan diubah kecuali
+         kamu ingin ganti ke project Firebase lain.
+    ============================================================ -->
+    <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyChYqRWtR-RfrPYn_DY-aGJ5rOLPvOBeKI",
+        authDomain: "server-media-75fdc.firebaseapp.com",
+        projectId: "server-media-75fdc",
+        storageBucket: "server-media-75fdc.firebasestorage.app",
+        messagingSenderId: "846086849982",
+        appId: "1:846086849982:web:3cd1d22f7956bd4e7b25ef",
+        measurementId: "G-TXCRRHB08S"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    </script>
+
+    <!-- ============================================================
+         REACT APPLICATION (Babel JSX)
+         Semua komponen aplikasi ada di bawah ini.
+    ============================================================ -->
+    <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    /* ==============================================================
+       =================== DAFTAR PRODUK ===========================
+       ==============================================================
+       CARA MENAMBAH PRODUK BARU:
+       1. Salin (copy) salah satu objek { } di bawah ini
+       2. Tempel (paste) di bawah produk terakhir (sebelum tanda ])
+       3. Ganti: id (harus unik/beda), name, price, description, image, category
+       4. Simpan file, lalu refresh browser
+
+       CONTOH menambah produk baru:
+       {
+         id: 4,
+         name: "Nama Buku Baru",
+         price: 25000,
+         description: "Deskripsi singkat buku.",
+         image: "https://link-gambar-buku.com/gambar.jpg",
+         category: "bisnis"
+       },
+    ============================================================== */
+    const PRODUCTS = [
+        {
+            id: 1,
+            name: "Master Crypto",
+            price: 15000,
+            description: "Buku Pembelajaran Crypto dari Nol. Cocok untuk pemula yang ingin memahami dunia cryptocurrency.",
+            image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=300&fit=crop",
+            category: "investasi"
+        },
+        {
+            id: 2,
+            name: "Master Saham",
+            price: 15000,
+            description: "Buku Pembelajaran Saham dari Nol. Panduan lengkap investasi saham untuk pemula.",
+            image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop",
+            category: "investasi"
+        },
+        {
+            id: 3,
+            name: "Master Forex",
+            price: 15000,
+            description: "Buku Pembelajaran Forex dari Nol. Strategi trading forex yang terbukti menguntungkan.",
+            image: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=400&h=300&fit=crop",
+            category: "investasi"
+        }
+        /* ← Tambahkan produk baru di sini (sebelum tanda kurung tutup) */
+    ];
+
+    /* ==============================================================
+       NOMOR WHATSAPP ADMIN
+       Ganti nomor di bawah ini dengan nomor WhatsApp admin/penjual.
+       Format: kode negara + nomor (tanpa +, tanpa spasi, tanpa strip)
+       Contoh Indonesia: 6281234567890
+    ============================================================== */
+    const ADMIN_WHATSAPP = "62895401061300";
+
+    /* ==============================================================
+       HELPER FUNCTIONS
+    ============================================================== */
+    const formatRupiah = (n) => "Rp " + n.toLocaleString("id-ID");
+    const getStorageKey = (uid, key) => `rizky_${uid}_${key}`;
+
+    const getUserData = (uid, key, fallback = []) => {
+        try { return JSON.parse(localStorage.getItem(getStorageKey(uid, key))) || fallback; }
+        catch { return fallback; }
+    };
+    const setUserData = (uid, key, data) => localStorage.setItem(getStorageKey(uid, key), JSON.stringify(data));
+
+    /* ==============================================================
+       TOAST NOTIFICATION COMPONENT
+    ============================================================== */
+    function Toast({ message, type, onClose }) {
+        useEffect(() => { const t = setTimeout(onClose, 3500); return () => clearTimeout(t); }, []);
+        const bg = type === 'success' ? 'bg-emerald-500/90' : type === 'error' ? 'bg-red-500/90' : 'bg-cyan-500/90';
+        const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+        return (
+            <div className={`toast ${bg} text-white backdrop-blur-md rounded-xl shadow-2xl flex items-center gap-3`}>
+                <i className={`fas ${icon} text-lg`}></i>
+                <span className="font-medium text-sm">{message}</span>
+            </div>
+        );
+    }
+
+    /* ==============================================================
+       NAVBAR COMPONENT
+    ============================================================== */
+    function Navbar({ user, page, setPage, onLogin, onLogout }) {
+        const [menuOpen, setMenuOpen] = useState(false);
+        const links = [
+            { id: 'home', label: 'Beranda', icon: 'fa-home' },
+            { id: 'catalog', label: 'Katalog', icon: 'fa-book-open' },
+        ];
+        if (user) {
+            links.push({ id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line' });
+            links.push({ id: 'wishlist', label: 'Wishlist', icon: 'fa-heart' });
+        }
+        return (
+            <header className="fixed top-0 w-full z-50 glass-strong">
+                <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                    <div className="font-heading font-bold text-xl sm:text-2xl cursor-pointer" onClick={() => setPage('home')}>
+                        <span className="gradient-text">Toko Rizky</span><span className="text-white">.ID</span>
+                    </div>
+                    {/* Desktop Nav */}
+                    <ul className="hidden md:flex items-center gap-1">
+                        {links.map(l => (
+                            <li key={l.id}>
+                                <button onClick={() => setPage(l.id)}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${page === l.id ? 'bg-white/10 text-cyan-400' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
+                                    <i className={`fas ${l.icon} mr-2`}></i>{l.label}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="hidden md:flex items-center gap-3">
+                        {user ? (
+                            <div className="flex items-center gap-3">
+                                <img src={user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName} alt="avatar"
+                                    className="w-8 h-8 rounded-full border-2 border-cyan-400/50"/>
+                                <span className="text-sm font-medium text-gray-300 max-w-[120px] truncate">{user.displayName}</span>
+                                <button onClick={onLogout} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all">
+                                    <i className="fas fa-sign-out-alt mr-1"></i>Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <button onClick={onLogin} className="btn-google px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" alt="G"/>
+                                Login Google
+                            </button>
+                        )}
+                    </div>
+                    {/* Mobile Toggle */}
+                    <button className="md:hidden text-gray-300 text-xl" onClick={() => setMenuOpen(!menuOpen)}>
+                        <i className={`fas ${menuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+                    </button>
+                </nav>
+                {/* Mobile Menu */}
+                {menuOpen && (
+                    <div className="md:hidden glass-strong border-t border-white/5 fade-in">
+                        <div className="px-4 py-4 flex flex-col gap-2">
+                            {links.map(l => (
+                                <button key={l.id} onClick={() => { setPage(l.id); setMenuOpen(false); }}
+                                    className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all ${page === l.id ? 'bg-white/10 text-cyan-400' : 'text-gray-300 hover:bg-white/5'}`}>
+                                    <i className={`fas ${l.icon} mr-3`}></i>{l.label}
+                                </button>
+                            ))}
+                            <hr className="border-white/10 my-2"/>
+                            {user ? (
+                                <div className="flex items-center justify-between px-4 py-2">
+                                    <div className="flex items-center gap-3">
+                                        <img src={user.photoURL || ''} alt="" className="w-8 h-8 rounded-full"/>
+                                        <span className="text-sm text-gray-300">{user.displayName}</span>
+                                    </div>
+                                    <button onClick={() => { onLogout(); setMenuOpen(false); }} className="text-red-400 text-sm"><i className="fas fa-sign-out-alt"></i></button>
+                                </div>
+                            ) : (
+                                <button onClick={() => { onLogin(); setMenuOpen(false); }} className="btn-google px-5 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 w-full">
+                                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" alt="G"/> Login dengan Google
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </header>
+        );
+    }
+
+    /* ==============================================================
+       HERO SECTION
+    ============================================================== */
+    function HeroSection({ onBrowse, onLogin, user }) {
+        return (
+            <section className="relative min-h-screen flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
+                <div className="orb w-[300px] h-[300px] lg:w-[500px] lg:h-[500px] bg-cyan-500 top-[-100px] left-[-100px] animate-pulse-glow"></div>
+                <div className="orb w-[250px] h-[250px] lg:w-[400px] lg:h-[400px] bg-purple-600 bottom-[-50px] right-[-50px] animate-pulse-glow" style={{animationDelay:'2s'}}></div>
+                <div className="orb w-[200px] h-[200px] lg:w-[300px] lg:h-[300px] bg-pink-500 top-[40%] left-[60%] animate-pulse-glow" style={{animationDelay:'4s'}}></div>
+                <div className="text-center relative z-10 max-w-3xl mx-auto fade-in">
+                    <div className="inline-block px-4 py-1.5 rounded-full glass text-xs font-medium text-cyan-400 mb-6">
+                        <i className="fas fa-sparkles mr-2"></i>Platform Buku Digital Terpercaya
+                    </div>
+                    <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-extrabold mb-6 leading-tight">
+                        <span className="text-white">Toko Buku </span>
+                        <span className="gradient-text">Digital Premium</span>
+                    </h1>
+                    <p className="text-gray-400 text-sm sm:text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+                        Temukan koleksi buku digital terlaris untuk belajar Crypto, Saham, dan Forex dari nol. 
+                        Mulai investasi ilmu Anda hari ini.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <button onClick={onBrowse} className="btn-gradient px-6 py-3 md:px-8 md:py-4 rounded-2xl text-white font-bold text-base md:text-lg flex items-center gap-3 shadow-lg">
+                            <i className="fas fa-book-open"></i> Lihat Katalog
+                        </button>
+                        {!user && (
+                            <button onClick={onLogin} className="btn-google px-6 py-3 md:px-8 md:py-4 rounded-2xl font-bold text-base md:text-lg flex items-center gap-3 shadow-lg">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="G"/> Login Google
+                            </button>
+                        )}
+                    </div>
+                    <div className="mt-8 md:mt-12 flex items-center justify-center gap-6 md:gap-8 text-gray-500 text-xs sm:text-sm">
+                        <div><span className="text-white font-bold text-2xl">500+</span><br/>Pembeli</div>
+                        <div className="w-px h-10 bg-white/10"></div>
+                        <div><span className="text-white font-bold text-2xl">50+</span><br/>Buku</div>
+                        <div className="w-px h-10 bg-white/10"></div>
+                        <div><span className="text-white font-bold text-2xl">4.9</span><br/>Rating</div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    /* ==============================================================
+       PRODUCT CARD
+    ============================================================== */
+    function ProductCard({ product, user, wishlist, onToggleWish, onBuy }) {
+        const isWished = wishlist.includes(product.id);
+        return (
+            <div className="glass rounded-2xl overflow-hidden card-hover border border-white/5 flex flex-col group">
+                <div className="relative overflow-hidden h-48 sm:h-56">
+                    <img src={product.image} alt={product.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark-900/80 via-transparent to-transparent"></div>
+                    <span className="absolute top-3 left-3 px-3 py-1 glass rounded-full text-xs font-medium text-cyan-400 capitalize">{product.category}</span>
+                    {user && (
+                        <button onClick={() => onToggleWish(product.id)}
+                            className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all ${isWished ? 'bg-pink-500 text-white' : 'glass text-gray-400 hover:text-pink-400'}`}>
+                            <i className={`fas fa-heart text-sm`}></i>
+                        </button>
+                    )}
+                </div>
+                <div className="p-5 flex flex-col flex-grow">
+                    <h3 className="font-heading font-bold text-lg text-white mb-1">{product.name}</h3>
+                    <p className="text-gray-400 text-sm mb-4 flex-grow">{product.description}</p>
+                    <div className="flex items-center justify-between">
+                        <span className="text-xl font-bold gradient-text">{formatRupiah(product.price)}</span>
+                        <button onClick={() => onBuy(product)} className="btn-gradient px-5 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2">
+                            <i className="fab fa-whatsapp"></i> Beli
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    /* ==============================================================
+       CATALOG PAGE
+    ============================================================== */
+    function CatalogPage({ user, wishlist, onToggleWish, onBuy }) {
+        const [search, setSearch] = useState('');
+        const filtered = PRODUCTS.filter(p =>
+            p.name.toLowerCase().includes(search.toLowerCase()) ||
+            p.category.toLowerCase().includes(search.toLowerCase())
+        );
+        return (
+            <section className="pt-28 pb-20 px-4 min-h-screen fade-in">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-3">Katalog <span className="gradient-text">Buku Digital</span></h2>
+                        <p className="text-gray-400 max-w-xl mx-auto">Pilih buku favorit Anda dan pesan langsung via WhatsApp.</p>
+                    </div>
+                    <div className="max-w-md mx-auto mb-10">
+                        <div className="glass rounded-xl flex items-center px-4 py-3">
+                            <i className="fas fa-search text-gray-500 mr-3"></i>
+                            <input type="text" placeholder="Cari buku..." value={search} onChange={e => setSearch(e.target.value)}
+                                className="bg-transparent outline-none text-white w-full text-sm placeholder:text-gray-500"/>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filtered.map(p => <ProductCard key={p.id} product={p} user={user} wishlist={wishlist} onToggleWish={onToggleWish} onBuy={onBuy}/>)}
+                    </div>
+                    {filtered.length === 0 && <p className="text-center text-gray-500 mt-10">Tidak ada produk ditemukan.</p>}
+                </div>
+            </section>
+        );
+    }
+
+    /* ==============================================================
+       DASHBOARD PAGE
+    ============================================================== */
+    function DashboardPage({ user, history, wishlist, setPage }) {
+        const totalSpent = history.reduce((a, b) => a + b.price, 0);
+        const stats = [
+            { label: 'Total Pesanan', value: history.length, icon: 'fa-shopping-bag', color: 'text-cyan-400' },
+            { label: 'Total Belanja', value: formatRupiah(totalSpent), icon: 'fa-wallet', color: 'text-emerald-400' },
+            { label: 'Wishlist', value: wishlist.length, icon: 'fa-heart', color: 'text-pink-400' },
+            { label: 'Buku Tersedia', value: PRODUCTS.length, icon: 'fa-book', color: 'text-purple-400' },
+        ];
+        return (
+            <section className="pt-28 pb-20 px-4 min-h-screen fade-in">
+                <div className="max-w-7xl mx-auto">
+                    {/* Welcome Banner */}
+                    <div className="rounded-2xl p-6 sm:p-8 mb-8 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 border border-white/10">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <img src={user.photoURL || ''} alt="" className="w-16 h-16 rounded-2xl border-2 border-cyan-400/50"/>
+                            <div>
+                                <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white">Halo, {user.displayName}! 👋</h2>
+                                <p className="text-gray-400 mt-1">{user.email} — Perpustakaan digital Anda siap digunakan.</p>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        {stats.map((s, i) => (
+                            <div key={i} className="glass rounded-2xl p-5 card-hover border border-white/5">
+                                <i className={`fas ${s.icon} ${s.color} text-2xl mb-3`}></i>
+                                <div className="text-2xl font-bold text-white font-heading">{s.value}</div>
+                                <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">{s.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Purchase History */}
+                    <div className="glass rounded-2xl p-6 border border-white/5">
+                        <h3 className="font-heading font-bold text-lg text-white mb-4"><i className="fas fa-clock-rotate-left text-cyan-400 mr-2"></i>Riwayat Pesanan</h3>
+                        {history.length === 0 ? (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-inbox text-4xl mb-3 block"></i>
+                                <p>Belum ada riwayat pesanan.</p>
+                                <button onClick={() => setPage('catalog')} className="btn-gradient px-5 py-2 rounded-xl text-white text-sm font-medium mt-4">Lihat Katalog</button>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {history.slice(0, 10).map((h, i) => (
+                                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/3 hover:bg-white/5 transition-all">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-lg bg-cyan-400/10 flex items-center justify-center"><i className="fas fa-book text-cyan-400"></i></div>
+                                            <div>
+                                                <div className="text-sm font-medium text-white">{h.name}</div>
+                                                <div className="text-xs text-gray-500">{h.date} • {h.time}</div>
+                                            </div>
+                                        </div>
+                                        <span className="text-sm font-bold text-emerald-400">{formatRupiah(h.price)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    /* ==============================================================
+       WISHLIST PAGE
+    ============================================================== */
+    function WishlistPage({ user, wishlist, onToggleWish, onBuy }) {
+        const items = PRODUCTS.filter(p => wishlist.includes(p.id));
+        return (
+            <section className="pt-28 pb-20 px-4 min-h-screen fade-in">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-3"><i className="fas fa-heart text-pink-400 mr-3"></i>Wishlist <span className="gradient-text">Saya</span></h2>
+                        <p className="text-gray-400">Produk yang sudah Anda simpan.</p>
+                    </div>
+                    {items.length === 0 ? (
+                        <div className="text-center py-20 text-gray-500">
+                            <i className="fas fa-heart-crack text-5xl mb-4 block"></i>
+                            <p className="text-lg">Wishlist masih kosong.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {items.map(p => <ProductCard key={p.id} product={p} user={user} wishlist={wishlist} onToggleWish={onToggleWish} onBuy={onBuy}/>)}
+                        </div>
+                    )}
+                </div>
+            </section>
+        );
+    }
+
+    /* ==============================================================
+       FOOTER WITH WATERMARKS
+    ============================================================== */
+    function Footer() {
+        return (
+            <footer className="border-t border-white/5 py-10 px-4">
+                <div className="max-w-7xl mx-auto text-center">
+                    <div className="font-heading font-bold text-2xl mb-3"><span className="gradient-text">Toko Rizky</span><span className="text-white">.ID</span></div>
+                    <p className="text-gray-500 text-sm mb-4">Pusat Penjualan Buku Digital Terlaris di Indonesia</p>
+                    <div className="flex items-center justify-center gap-2 text-gray-600 text-xs mb-2">
+                        <span>Developed by</span>
+                        <span className="text-cyan-400 font-semibold">ZetaGo-Aurum</span>
+                        <span>•</span>
+                        <span className="text-purple-400 font-semibold">Rayhan Dzaky</span>
+                        <span>•</span>
+                        <span className="text-pink-400 font-semibold">KYOKO</span>
+                    </div>
+                    <p className="text-gray-700 text-xs mt-3">&copy; {new Date().getFullYear()} Toko Rizky.ID. All rights reserved.</p>
+                </div>
+            </footer>
+        );
+    }
+
+    /* ==============================================================
+       WATERMARK BADGE (fixed bottom-right)
+    ============================================================== */
+    function WatermarkBadge() {
+        return (
+            <div className="watermark-badge glass text-gray-500 hidden sm:flex items-center gap-2">
+                <span className="text-cyan-400 font-semibold">ZG-A</span>
+                <span>•</span>
+                <span className="text-purple-400">RD</span>
+                <span>•</span>
+                <span className="text-pink-400">KYOKO</span>
+            </div>
+        );
+    }
+
+    /* ==============================================================
+       MAIN APP — State, Auth, Routing
+    ============================================================== */
+    function App() {
+        const [user, setUser] = useState(null);
+        const [page, setPage] = useState('home');
+        const [wishlist, setWishlist] = useState([]);
+        const [history, setHistory] = useState([]);
+        const [toast, setToast] = useState(null);
+        const [authLoading, setAuthLoading] = useState(true);
+
+        const showToast = (message, type = 'info') => setToast({ message, type });
+
+        // Listen for Firebase Auth state change
+        useEffect(() => {
+            const unsub = auth.onAuthStateChanged((u) => {
+                setUser(u);
+                setAuthLoading(false);
+                if (u) {
+                    setWishlist(getUserData(u.uid, 'wishlist', []));
+                    setHistory(getUserData(u.uid, 'history', []));
+                }
+            });
+            return () => unsub();
+        }, []);
+
+        // Google Login
+        const handleLogin = async () => {
+            try {
+                await auth.signInWithPopup(googleProvider);
+                showToast('Login berhasil! Selamat datang 🎉', 'success');
+            } catch (err) {
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    showToast('Login gagal: ' + err.message, 'error');
+                }
+            }
+        };
+
+        // Logout
+        const handleLogout = async () => {
+            await auth.signOut();
+            setWishlist([]);
+            setHistory([]);
+            setPage('home');
+            showToast('Berhasil logout.', 'info');
+        };
+
+        // Toggle Wishlist
+        const toggleWish = (id) => {
+            if (!user) { handleLogin(); return; }
+            let next;
+            if (wishlist.includes(id)) {
+                next = wishlist.filter(x => x !== id);
+                showToast('Dihapus dari wishlist', 'info');
+            } else {
+                next = [...wishlist, id];
+                showToast('Ditambahkan ke wishlist ❤️', 'success');
+            }
+            setWishlist(next);
+            setUserData(user.uid, 'wishlist', next);
+        };
+
+        /* ==============================================================
+           BELI VIA WHATSAPP
+           Pesan akan dikirim ke WhatsApp admin dengan format profesional.
+           User harus login agar nama & email tercantum di pesan.
+        ============================================================== */
+        const handleBuy = (product) => {
+            if (!user) {
+                showToast('Silakan login terlebih dahulu untuk membeli.', 'error');
+                handleLogin();
+                return;
+            }
+            const now = new Date();
+            const date = now.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+            const time = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+
+            // Simpan ke riwayat
+            const entry = { name: product.name, price: product.price, date, time };
+            const newHist = [entry, ...history];
+            setHistory(newHist);
+            setUserData(user.uid, 'history', newHist);
+
+            // Format pesan WhatsApp
+            const msg = `🛒 *PESANAN BARU — Toko Rizky.ID*
+━━━━━━━━━━━━━━━━━━━━━
+
+👤 *Nama Pemesan:* ${user.displayName}
+📧 *Email:* ${user.email}
+
+📘 *Produk:* ${product.name}
+💰 *Harga:* ${formatRupiah(product.price)}
+
+📅 *Tanggal:* ${date}
+🕐 *Waktu:* ${time}
+
+📝 *Catatan:*
+Saya tertarik dengan produk ini dan ingin melanjutkan pembelian. Mohon infokan langkah selanjutnya ya 🙏
+
+Terima kasih! 😊
+━━━━━━━━━━━━━━━━━━━━━
+🔖 Dikirim dari Toko Rizky.ID`;
+
+            window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+            showToast(`Pesanan "${product.name}" dikirim ke WhatsApp! 🚀`, 'success');
+        };
+
+        // Loading screen
+        if (authLoading) {
+            return (
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="w-12 h-12 border-4 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-gray-500">Memuat...</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render current page
+        const renderPage = () => {
+            switch(page) {
+                case 'catalog':
+                    return <CatalogPage user={user} wishlist={wishlist} onToggleWish={toggleWish} onBuy={handleBuy}/>;
+                case 'dashboard':
+                    return user ? <DashboardPage user={user} history={history} wishlist={wishlist} setPage={setPage}/> : (handleLogin(), <HeroSection onBrowse={() => setPage('catalog')} onLogin={handleLogin} user={user}/>);
+                case 'wishlist':
+                    return user ? <WishlistPage user={user} wishlist={wishlist} onToggleWish={toggleWish} onBuy={handleBuy}/> : (handleLogin(), <HeroSection onBrowse={() => setPage('catalog')} onLogin={handleLogin} user={user}/>);
+                default:
+                    return <HeroSection onBrowse={() => setPage('catalog')} onLogin={handleLogin} user={user}/>;
+            }
+        };
+
+        return (
+            <div className="min-h-screen bg-dark-900">
+                <Navbar user={user} page={page} setPage={setPage} onLogin={handleLogin} onLogout={handleLogout}/>
+                {renderPage()}
+                <Footer/>
+                <WatermarkBadge/>
+                {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)}/>}
+            </div>
+        );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
