@@ -120,7 +120,7 @@
             name: "Master Crypto",
             price: 15000,
             description: "Buku Pembelajaran Crypto dari Nol. Cocok untuk pemula yang ingin memahami dunia cryptocurrency.",
-            image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=300&fit=crop",
+            image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=300&fit=crop", // Fixed: Diganti link online
             category: "investasi"
         },
         {
@@ -139,15 +139,14 @@
             image: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=400&h=300&fit=crop",
             category: "investasi"
         },
-         {
+        {
             id: 4,
             name: "Belajar Coding Untuk Pemula",
             price: 20000,
             description: "Buku Pembelajaran Coding untuk Pemula. Panduan Lengkap Belajar Pemrograman dari Nol.",
-            image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+            image:"https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&h=300&fit=crop",
             category: "teknologi"
         }
-
         /* ← Tambahkan produk baru di sini (sebelum tanda kurung tutup) */
     ];
 
@@ -287,7 +286,7 @@
                         <span className="gradient-text">Digital Premium</span>
                     </h1>
                     <p className="text-gray-400 text-sm sm:text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-                        Temukan koleksi buku digital terlaris untuk belajar Crypto, Saham, dan Forex dari nol. 
+                        Temukan koleksi buku digital terlaris untuk belajar Crypto, Saham, dan Forex dari nol.
                         Mulai investasi ilmu Anda hari ini.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -591,24 +590,12 @@
             setUserData(user.uid, 'history', newHist);
 
             // Format pesan WhatsApp
-            const msg = `🛒 *PESANAN BARU — Toko Rizky.ID*
-━━━━━━━━━━━━━━━━━━━━━
-
-👤 *Nama Pemesan:* ${user.displayName}
-📧 *Email:* ${user.email}
-
-📘 *Produk:* ${product.name}
-💰 *Harga:* ${formatRupiah(product.price)}
-
-📅 *Tanggal:* ${date}
-🕐 *Waktu:* ${time}
-
-📝 *Catatan:*
-Saya tertarik dengan produk ini dan ingin melanjutkan pembelian. Mohon infokan langkah selanjutnya ya 🙏
-
-Terima kasih! 😊
-━━━━━━━━━━━━━━━━━━━━━
-🔖 Dikirim dari Toko Rizky.ID`;
+            const msg = `🛒 *PESANAN BARU — Toko Rizky.ID*━━━━━━━━━━━━━━━━━━━━━
+👤 *Nama Pemesan:* ${user.displayName}📧 *Email:* ${user.email}
+📘 *Produk:* ${product.name}💰 *Harga:* ${formatRupiah(product.price)}
+📅 *Tanggal:* ${date}🕐 *Waktu:* ${time}
+📝 *Catatan:*Saya tertarik dengan produk ini dan ingin melanjutkan pembelian. Mohon infokan langkah selanjutnya ya 🙏
+Terima kasih! 😊━━━━━━━━━━━━━━━━━━━━━🔖 Dikirim dari Toko Rizky.ID`;
 
             window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
             showToast(`Pesanan "${product.name}" dikirim ke WhatsApp! 🚀`, 'success');
@@ -654,13 +641,4 @@ Terima kasih! 😊
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
